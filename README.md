@@ -4,16 +4,190 @@ The local quotation app now supports pasted enquiries, catalogue resolution,
 editable quantities and discounts, exact pricing, split-delivery consent,
 commercial approval holds, review, PDF/email export and a saved case queue.
 
+### Give this prompt to your AI assistant
+
+Teammates can paste this into a coding assistant that has terminal access on
+their own computer. The assistant should carry out setup, not just explain it.
+
+```text
+Set up and run the QuoteFlow demo on my computer.
+
+Repository: https://github.com/AbhiroopVerma/QuoteFlow.git
+Branch: codex/working-demo
+
+1. Inspect my operating system and check Git, Python 3.10+, Node.js and npm.
+   If a prerequisite is missing, explain what is needed before installing it.
+2. Clone the specified branch into a new QuoteFlow directory. If I already
+   have a checkout, inspect its branch and working tree first. Preserve my
+   changes; use a separate directory if switching would interfere with them.
+3. Read the localhost setup section of README.md and app/README.md. Run setup
+   from the repository root. Create .venv, install app/requirements.txt with
+   that environment's Python, and run npm ci --ignore-scripts.
+4. Run the app tests with the virtual-environment Python:
+   python -m unittest discover -s app/tests -v
+   python docs/demo/verify_fixtures.py
+   Use the actual .venv Python path for my operating system, not a global
+   Python. Report any failures without claiming they passed.
+5. Start the same environment's Python with:
+   python -m app.server --port 8765
+   If that port is occupied, choose another available port; do not stop
+   another process. Keep the server running and give me its actual local URL.
+6. If browser tools are available, open the app and check the Standard order
+   sample: create the enquiry, confirm lines, verify SGD 1,866.63, then check
+   the preview and PDF download. Tell me if browser verification was skipped.
+
+This is an offline, synthetic, single-user localhost demo. Do not configure
+AWS, API keys, .env secrets, paid AI, public hosting or external email.
+Do not change application code or commit/push anything just to perform setup.
+Finish with the URL, test results, and how I can stop and restart the server.
+```
+
+Each teammate runs a separate local instance and database. No API key or shared
+account login is required. Share this branch's README with them, not your own
+`127.0.0.1` link, which only works on the computer running that instance.
+
+### 1. Check prerequisites
+
+Install Git, Python 3.10 or newer, and Node.js with npm on the computer where
+you want to run the demo. Check them in Terminal (macOS/Linux) or PowerShell
+(Windows):
+
+```bash
+git --version
+python3 --version
+node --version
+npm --version
+```
+
+On Windows, use `py -3 --version` instead of `python3 --version`. Internet
+access is needed to clone the repository and install dependencies. After
+installation, this demo runs locally without internet, AWS, an API key or a
+`.env` file. The AWS guides further down this README are separate and are
+not needed for localhost setup.
+
+### 2. Get the working demo branch
+
+For a new checkout:
+
+```bash
+git clone --branch codex/working-demo https://github.com/AbhiroopVerma/QuoteFlow.git
+cd QuoteFlow
+```
+
+If you already have a checkout, open its `QuoteFlow` directory and check
+`git status` first. Keep any uncommitted work before changing branches, then:
+
+```bash
+git fetch origin
+git switch codex/working-demo
+git pull --ff-only
+```
+
+Run all following commands from the repository root: the directory containing
+`app/`, `package.json` and this README. The app is on `codex/working-demo`;
+checking out `main` may not include it yet.
+
+### 3. Install dependencies
+
+**macOS / Linux:**
+
 ```bash
 python3 -m venv .venv
-.venv/bin/pip install -r app/requirements.txt
+.venv/bin/python -m pip install -r app/requirements.txt
 npm ci --ignore-scripts
+```
+
+**Windows PowerShell:**
+
+```powershell
+py -3 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r app/requirements.txt
+npm.cmd ci --ignore-scripts
+```
+
+The explicit virtual-environment paths mean you do not need to activate the
+environment or change PowerShell's execution policy. Python installs the PDF
+library; npm installs the icons served by the app. There is no frontend build
+step and no separate Node server to start.
+
+### 4. Start localhost
+
+**macOS / Linux:**
+
+```bash
 .venv/bin/python -m app.server --port 8765
 ```
 
-Open http://127.0.0.1:8765 and choose a sample enquiry or create your own.
-Use another `--port` if 8765 is already occupied. Python 3.10+ and Node/npm
-are required. The server binds only to localhost. Stop it with Ctrl+C.
+**Windows PowerShell:**
+
+```powershell
+.\.venv\Scripts\python.exe -m app.server --port 8765
+```
+
+Keep that terminal open. Once it prints:
+
+```text
+QuoteFlow local demo: http://127.0.0.1:8765
+```
+
+open [QuoteFlow on localhost](http://127.0.0.1:8765) in your browser.
+`127.0.0.1` means the computer running the server; this link will not open
+your instance from somebody else's computer or phone.
+
+### 5. Try the first quotation
+
+1. Choose **Standard order** under Sample enquiries.
+2. Confirm the synthetic customer checkbox and click **Create enquiry**.
+3. Click **Confirm & calculate**. The expected total is **SGD 1,866.63**.
+4. Open **Preview quote**, click **Mark reviewed**, then **Download PDF**.
+
+The **Product clarification** sample demonstrates the ABS/metal choice.
+The **Commercial exception** sample stays on hold for Finance approval;
+the local operator cannot grant that authority.
+
+### Stop, restart and change the port
+
+Press **Ctrl+C** in the server terminal to stop it. To restart later, open a
+terminal in `QuoteFlow` and repeat the start command from step 4. Dependencies
+do not need reinstalling each time. Reload the browser after a restart to
+establish a new local session.
+
+If port 8765 is occupied, use a different port, for example:
+
+```bash
+.venv/bin/python -m app.server --port 8766
+```
+
+On Windows use `.\.venv\Scripts\python.exe` in place of `.venv/bin/python`.
+Then open [the alternate localhost address](http://127.0.0.1:8766).
+Do not stop another application's server just to free the default port.
+
+Cases survive restarts in `app/data/cases.db`. This local database is not
+committed to Git. Use the trash button on a case to delete it and its history.
+
+### Troubleshooting
+
+| Problem | What to check |
+| --- | --- |
+| `python3`, `py`, `git` or `npm` is not found | Install the missing prerequisite, reopen the terminal and retry its version command. |
+| `No module named app` | Run from the repository root, not from inside `app/`. Check that you are on `codex/working-demo`. |
+| `No module named reportlab` | Repeat the pip install in step 3 using the same virtual-environment Python used to start the server. |
+| Missing icons | Run `npm ci --ignore-scripts` (`npm.cmd ci --ignore-scripts` on Windows) from the repository root, then reload. |
+| `Address already in use` | Select another port and use that same port in the browser URL. |
+| Browser says connection refused | Ensure the start command is still running and the URL matches the printed port. Use `http`, not `https`. |
+| Session error after restarting | Reload the app's root URL to obtain a fresh session cookie. |
+| Cannot mark a quote reviewed | Resolve missing product details, invalid quantities, delivery consent and any commercial exceptions. Manager/Finance approval is not implemented in this sandbox. |
+
+Optional checks, from the repository root on macOS/Linux:
+
+```bash
+.venv/bin/python -m unittest discover -s app/tests -v
+.venv/bin/python docs/demo/verify_fixtures.py
+```
+
+On Windows replace `.venv/bin/python` with `.\.venv\Scripts\python.exe`.
+The tests start temporary localhost servers; you do not need the main demo
+server running. Browser testing is documented in [app/README.md](app/README.md#verification).
 
 This is a **single-user, synthetic, offline sandbox**. It uses bounded catalogue
 parsing, not an AI model. The frozen business date is 17 September 2026.

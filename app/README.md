@@ -2,10 +2,10 @@
 
 ## Run
 
-From the repository root, install `app/requirements.txt` into a Python virtual
-environment, run `npm ci --ignore-scripts` for locally served Lucide icons, then
-run `python -m app.server --port 8765`. Open http://127.0.0.1:8765.
-No remote assets, model calls, credentials or email service are used.
+Follow the [step-by-step localhost setup](../README.md#run-the-quoteflow-demo)
+for prerequisites, the correct Git branch, macOS/Linux and Windows commands,
+starting/stopping the server, and troubleshooting. No remote assets, model
+calls, credentials or email service are used at runtime.
 
 ## Available workflow
 
