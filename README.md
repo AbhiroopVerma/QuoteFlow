@@ -1,3 +1,11 @@
+## QuoteFlow demo specification
+
+The [demo readiness pack](docs/demo/README.md) locks the synthetic quotation
+scope, commercial and security rules, six wireframes, and 25 golden cases.
+It is a specification for the quotation app; the gateway guides below are
+infrastructure examples. Paid model execution remains disabled until the
+shared budget is verified.
+
 ## Contents
 
 | Guide | Sections |

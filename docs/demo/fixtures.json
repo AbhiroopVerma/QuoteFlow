@@ -1,0 +1,19 @@
+{
+  "version": "demo-v1",
+  "synthetic": true,
+  "clock": "2026-09-17T10:00:00+08:00",
+  "customer": {"id": "CUST-SG-1042", "name": "Acme Facilities Pte Ltd", "currency": "SGD", "tier": "Gold", "credit_hold": false},
+  "seller": "QuoteFlow Demo Supplies Pte Ltd",
+  "price_valid_from": "2026-09-01",
+  "price_valid_until": "2026-09-30",
+  "price_snapshot": "2026-09-17T09:00:00+08:00",
+  "inventory_snapshot": "2026-09-17T09:55:00+08:00",
+  "products": [
+    {"sku": "EL-MCB-1P16", "name": "16A single-pole C-curve MCB", "required_attributes": ["16A", "1P", "C curve"], "uom": "EA", "pack": 10, "moq": 10, "list": "28.50", "gold": "27.08", "cost": "17.20", "active": true, "atp": 200, "inbound": 0},
+    {"sku": "CBL-CU25-R100", "name": "2.5 mm2 copper cable 100 m roll", "required_attributes": ["copper", "2.5 mm2", "100 m roll"], "uom": "ROLL", "pack": 1, "moq": 1, "list": "185.00", "gold": "175.75", "contract": "172.00", "cost": "132.00", "active": true, "atp": 6, "inbound": 10, "eta": "2026-09-21"},
+    {"sku": "LT-PNL-36W-4K", "name": "36W 4000K LED panel", "required_attributes": ["36W", "4000K"], "uom": "EA", "pack": 4, "moq": 4, "list": "64.00", "gold": "60.80", "cost": "42.50", "active": true, "atp": 40, "inbound": 80, "eta": "2026-09-21"},
+    {"sku": "BX-IP65-2015-A", "name": "IP65 200 x 150 mm ABS junction box", "required_attributes": ["IP65", "200 x 150 mm", "ABS"], "uom": "EA", "pack": 5, "moq": 5, "list": "21.00", "gold": "19.95", "cost": "12.80", "active": true, "atp": 100, "inbound": 0},
+    {"sku": "BX-IP65-2015-M", "name": "IP65 200 x 150 mm metal junction box", "required_attributes": ["IP65", "200 x 150 mm", "metal"], "uom": "EA", "pack": 5, "moq": 5, "list": "32.00", "gold": "30.40", "cost": "19.00", "active": true, "atp": 100, "inbound": 0},
+    {"sku": "LT-PNL-32W-4K", "name": "Legacy 32W 4000K LED panel", "required_attributes": ["32W", "4000K"], "uom": "EA", "pack": 4, "moq": 4, "list": "55.00", "gold": "52.25", "cost": "39.00", "active": false, "atp": 0, "inbound": 0, "suggested_alternative": "LT-PNL-36W-4K"}
+  ]
+}
