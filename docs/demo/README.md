@@ -6,8 +6,10 @@ Start with [the locked demo contract](DECISIONS.md), then inspect the
 
 The 15 September 2026 proposal supplied by the user is the design reference.
 This pack deliberately narrows it to a local, synthetic, email-text-only demo.
-It contains specifications and fixtures, not a QuoteFlow application. Existing
-gateway examples in the repository are not the quotation implementation.
+It contains the specification and fixtures. The first offline implementation is
+now in `app/`; see the root README to run it. Existing gateway examples remain
+separate from the quotation application. `app/README.md` records implemented
+behavior and outstanding production requirements.
 
 ## What is decided
 

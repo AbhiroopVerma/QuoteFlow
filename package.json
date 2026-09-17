@@ -1,0 +1,7 @@
+{
+  "name": "quoteflow-local-demo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Local QuoteFlow demo browser assets",
+  "dependencies": {"lucide": "1.8.0"}
+}

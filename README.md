@@ -1,9 +1,32 @@
+## Run the QuoteFlow demo
+
+The local quotation app now supports pasted enquiries, catalogue resolution,
+editable quantities and discounts, exact pricing, split-delivery consent,
+commercial approval holds, review, PDF/email export and a saved case queue.
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -r app/requirements.txt
+npm ci --ignore-scripts
+.venv/bin/python -m app.server --port 8765
+```
+
+Open http://127.0.0.1:8765 and choose a sample enquiry or create your own.
+Use another `--port` if 8765 is already occupied. Python 3.10+ and Node/npm
+are required. The server binds only to localhost. Stop it with Ctrl+C.
+
+This is a **single-user, synthetic, offline sandbox**. It uses bounded catalogue
+parsing, not an AI model. The frozen business date is 17 September 2026.
+Manager/Finance exceptions remain on hold; production authentication and actual
+commercial approval accounts are not implemented. No keys, paid calls or
+external emails are needed. Do not expose this server publicly or enter real
+customer data. See [runtime details and limitations](app/README.md).
+
 ## QuoteFlow demo specification
 
 The [demo readiness pack](docs/demo/README.md) locks the synthetic quotation
 scope, commercial and security rules, six wireframes, and 25 golden cases.
-It is a specification for the quotation app; the gateway guides below are
-infrastructure examples. Paid model execution remains disabled until the
+The gateway guides below are infrastructure examples. Paid model execution remains disabled until the
 shared budget is verified.
 
 ## Contents
