@@ -14,12 +14,12 @@ offline mode. Fixtures are synthetic; storage is local and gitignored.
 1. Write failing domain tests for golden monetary cases, parsing, clarification,
    stock consent, revision checks and customer-only exports.
    Run `python3 -m unittest discover -s app/tests -v` before implementation.
-2. Implement `app/domain.py` for deterministic catalogue extraction, validation,
+2. Implement `app/backend/domain.py` for deterministic catalogue extraction, validation,
    pricing and exception detection. Use existing JSON fixture sources.
-3. Implement `app/server.py` with SQLite transactions, bounded JSON requests,
+3. Implement `app/backend/http.py` with repository-managed SQLite transactions, bounded JSON requests,
    same-origin mutation checks, revision concurrency, local session cookie,
    sanitized error responses and a customer-safe quote document.
-4. Build `app/static/` with inbox, enquiry modal, source/line resolution view,
+4. Build `app/frontend/` with inbox, enquiry modal, source/line resolution view,
    prices, stock acceptance, preview, PDF/email export and measured dashboard.
    Browser controls call server endpoints; no browser monetary calculations.
 5. Test HTTP workflow, stale writes, uploads, exports and PDF text. Exercise the

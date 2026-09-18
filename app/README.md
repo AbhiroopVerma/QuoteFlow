@@ -1,5 +1,10 @@
 # QuoteFlow local sandbox
 
+The application is organized into `frontend/`, `backend/`, `database/` and
+`tests/`. See [architecture and team workflow](../docs/ARCHITECTURE.md) for file
+ownership, the database schema and the enquiry-to-quote flow. `server.py` remains
+the launch entry point; existing `data/cases.db` files stay in place.
+
 ## Run
 
 Follow the [step-by-step localhost setup](../README.md#run-the-quoteflow-demo)
@@ -18,9 +23,13 @@ calls, credentials or email service are used at runtime.
 - Record explicit split-delivery consent when inbound stock is required.
 - Preview and export a customer-only draft PDF or text email. Final review is
   blocked until line questions, delivery and commercial rules pass.
-- Standard quotes can be marked reviewed. Manager/Finance exceptions stay on
-  hold: the local operator is not impersonated as an authorized approver.
-- Filter/search the queue, inspect revision events and delete local cases.
+- Standard quotes can be marked reviewed by Demo Administrator. For exceptions,
+  request approvals, select the required demo manager/Finance persona and record
+  its decision with a reason. Return to Demo Administrator for final review.
+- Rejected quotes require a revision. Edited quotes require fresh approval;
+  stale requests and contradictory repeated decisions are rejected.
+- Filter/search the queue, inspect saved revision inputs and decision events,
+  and delete local cases as Demo Administrator.
 - Inspect real local case counts in Overview. No fabricated performance metrics.
 
 ## Boundaries
@@ -43,14 +52,22 @@ Unknown products and unaccepted delivery prevent export.
 
 Local sessions use an HttpOnly SameSite cookie plus Origin/Host checks, request
 size limits and a restrictive content policy. This is NOT multi-user identity,
-role-based authorization, production audit immutability, encryption at rest,
+production authorization, audit immutability, encryption at rest,
 idempotent network retry handling or a billing enforcement service. Browser
 double submission is disabled, but retrying a failed create may create a second
 case; inspect the queue before retrying. File uploads are rejected. The request
 logger is disabled; raw enquiry content is never emitted to operational logs.
 
-SQLite stores case inputs and revision event metadata at `app/data/cases.db`,
-which is gitignored. It does not retain complete historical input snapshots.
+The demo persona selector is explicitly a simulation, not login. A server-owned
+allowlist maps persona IDs to roles and enforces action permissions, but anyone
+with access to this local app may choose any persona. Do not describe this as
+verified identity, separation of real people, or production access control.
+
+SQLite stores case inputs, append-only revision-input snapshots and decision
+event metadata at `app/data/cases.db`, which is gitignored. Existing cases gain
+only their current input snapshot; older missing inputs cannot be reconstructed.
+There is no API to edit snapshots, but the database is not tamper-proof. Deleting
+a case deletes its snapshots too.
 Delete cases using the trash control after the demo. Automatic seven-day expiry
 is not implemented; the local operator owns deletion. Stop the server before
 removing a local database. No sensitive real customer information belongs here.
@@ -60,14 +77,25 @@ removing a local database. No sensitive real customer information belongs here.
 ```bash
 python -m unittest discover -s app/tests -v
 python docs/demo/verify_fixtures.py
-node --check app/static/app.js
+node --check app/frontend/js/app.js
+node --test app/tests/specifications.cjs
 ```
 
 The domain tests recompute the 13 monetary golden expectations using the actual
 app engine, plus parser and validation probes. HTTP tests exercise standard
 review/export, concurrency conflicts, upload rejection, cross-origin checks and
-approval holds. This is not a report that all 25 golden enquiries passed through
+demo approval decisions and revision invalidation. This is not a report that all 25 golden enquiries passed through
 the parser and workflow; the unimplemented golden scenarios remain future work.
+
+For environments that cannot open listening ports, run non-network checks:
+
+```bash
+python -m unittest app.tests.test_requests app.tests.test_workflow app.tests.test_domain app.tests.test_database -v
+```
+
+These invoke the request dispatcher in memory against a temporary SQLite store.
+They validate behavior but do not replace live HTTP, response-header or browser
+checks. The full discovery command above includes both in-memory and live tests.
 
 For browser checks, install Playwright in your test environment and run, with
 the app server already running on port 8765:
@@ -79,6 +107,6 @@ node app/tests/browser.cjs
 Set `PLAYWRIGHT_MODULE` to an installed Playwright package path if it is not on
 the normal module path. `BROWSER_CHANNEL=chrome` uses installed Google Chrome;
 otherwise install Playwright Chromium. Tests run happy path, clarification and
-approval-hold flows at desktop/mobile sizes, download a PDF, check page overflow
+approval-decision/invalidation flows at desktop/mobile sizes, download a PDF, check page overflow
 and JavaScript errors, then delete only the cases they created. Screenshots and
 the downloaded PDF go to gitignored `work/browser/`.

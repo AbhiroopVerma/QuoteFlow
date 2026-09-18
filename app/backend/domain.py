@@ -6,7 +6,7 @@ import re
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from pathlib import Path
 
-FIXTURES = json.loads((Path(__file__).resolve().parents[1] / 'docs/demo/fixtures.json').read_text())
+FIXTURES = json.loads((Path(__file__).resolve().parents[2] / 'docs/demo/fixtures.json').read_text())
 CATALOGUE = {p['sku']: p for p in FIXTURES['products']}
 D = Decimal
 

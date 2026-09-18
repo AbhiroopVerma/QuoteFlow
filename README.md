@@ -142,8 +142,19 @@ your instance from somebody else's computer or phone.
 4. Open **Preview quote**, click **Mark reviewed**, then **Download PDF**.
 
 The **Product clarification** sample demonstrates the ABS/metal choice.
-The **Commercial exception** sample stays on hold for Finance approval;
-the local operator cannot grant that authority.
+The **Commercial exception** sample demonstrates simulated Finance approval:
+
+1. As **Demo Administrator**, confirm the lines and record split-delivery consent.
+2. Open **Approvals** and click **Request demo approvals**.
+3. Select **Demo Finance Approver** in the header, enter a decision reason and
+   approve the revision, or request changes.
+4. Switch back to **Demo Administrator** for the final preview and review.
+5. Editing the quote invalidates its approvals. The History button shows saved
+   revision inputs and decision events.
+
+These selectable personas are a rehearsal, not authenticated users or real
+commercial authorization. Do not use them with real quotations. Existing running
+servers must be restarted after updating the code to load the approval endpoints.
 
 ### Stop, restart and change the port
 
@@ -176,7 +187,8 @@ committed to Git. Use the trash button on a case to delete it and its history.
 | `Address already in use` | Select another port and use that same port in the browser URL. |
 | Browser says connection refused | Ensure the start command is still running and the URL matches the printed port. Use `http`, not `https`. |
 | Session error after restarting | Reload the app's root URL to obtain a fresh session cookie. |
-| Cannot mark a quote reviewed | Resolve missing product details, invalid quantities, delivery consent and any commercial exceptions. Manager/Finance approval is not implemented in this sandbox. |
+| Cannot mark a quote reviewed | Resolve product and delivery questions, obtain every required simulated approval, then select Demo Administrator for final review. Rejected or edited quotes need a new approval cycle. |
+| Approval service unavailable | Stop and restart the local server after pulling updates, then reload the browser. |
 
 Optional checks, from the repository root on macOS/Linux:
 
@@ -191,12 +203,15 @@ server running. Browser testing is documented in [app/README.md](app/README.md#v
 
 This is a **single-user, synthetic, offline sandbox**. It uses bounded catalogue
 parsing, not an AI model. The frozen business date is 17 September 2026.
-Manager/Finance exceptions remain on hold; production authentication and actual
-commercial approval accounts are not implemented. No keys, paid calls or
+Manager/Finance decisions can be rehearsed with demo personas; production
+authentication and actual commercial approval accounts are not implemented. No keys, paid calls or
 external emails are needed. Do not expose this server publicly or enter real
 customer data. See [runtime details and limitations](app/README.md).
 
 ## QuoteFlow demo specification
+
+See [architecture and teammate workflow](docs/ARCHITECTURE.md) for the frontend,
+backend and database folders, request flow, schema ownership and product icons.
 
 The [demo readiness pack](docs/demo/README.md) locks the synthetic quotation
 scope, commercial and security rules, six wireframes, and 25 golden cases.

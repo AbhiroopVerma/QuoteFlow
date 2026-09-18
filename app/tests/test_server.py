@@ -5,7 +5,7 @@ import threading
 import unittest
 from pathlib import Path
 
-from app.server import make_server
+from app.backend.http import make_server
 
 
 class ServerTests(unittest.TestCase):
@@ -84,8 +84,58 @@ class ServerTests(unittest.TestCase):
         case = self.create('50 EL-MCB-1P16 in USD')
         self.assertTrue(case['evaluation']['blocks'])
 
+    def test_frontend_assets_and_catalogue_specifications(self):
+        for path in ('/', '/css/style.css', '/js/app.js', '/js/specifications.js'):
+            self.assertEqual(self.request('GET', path)[0], 200, path)
+        self.assertEqual(self.request('GET', '/database/schema.sql')[0], 404)
+        status, catalogue = self.request('GET', '/api/catalogue')
+        self.assertEqual(status, 200)
+        self.assertEqual(catalogue['products'][0]['specifications']['current'], '16 A')
+
     def test_approval_cannot_be_forged(self):
         case = self.create('10 EL-MCB-1P16 with 20 percent discount')
         status, _ = self.request('PATCH', f'/api/cases/{case["id"]}', {'revision': 1, 'reviewed': True})
         self.assertEqual(status, 400)
         self.assertEqual(self.request('POST', f'/api/cases/{case["id"]}/review', {'revision': 1})[0], 409)
+
+    def test_full_demo_approval_and_revision_snapshots(self):
+        case = self.create('10 EL-MCB-1P16 with 20 percent discount')
+        path = f'/api/cases/{case["id"]}'
+        status, requested = self.request('POST', path + '/request-approvals', {'revision': 1})
+        self.assertEqual(status, 200)
+        self.assertEqual(requested['approvals'][0]['status'], 'pending')
+        decision = {'revision': 1, 'decision': 'approved', 'reason': 'Synthetic demo exception'}
+        self.assertEqual(self.request('POST', path + '/decision', decision)[0], 403)
+        self.assertEqual(self.request('POST', path + '/decision', decision,
+                                     {'X-Demo-Actor': 'manager'})[0], 403)
+        status, approved = self.request('POST', path + '/decision', decision,
+                                       {'X-Demo-Actor': 'finance'})
+        self.assertEqual(status, 200)
+        self.assertEqual(approved['status'], 'Ready for review')
+        self.assertEqual(self.request('POST', path + '/review', {'revision': 1},
+                                     {'X-Demo-Actor': 'finance'})[0], 403)
+        self.assertEqual(self.request('POST', path + '/review', {'revision': 1})[0], 200)
+        updated_lines = case['lines']
+        updated_lines[0]['qty'] = 20
+        status, revised = self.request('PATCH', path, {'revision': 1, 'lines': updated_lines})
+        self.assertEqual(status, 200)
+        self.assertFalse(revised['reviewed'])
+        self.assertEqual(revised['status'], 'Awaiting approval')
+        self.assertEqual(self.request('POST', path + '/decision', decision,
+                                     {'X-Demo-Actor': 'finance'})[0], 409)
+        status, history = self.request('GET', path + '/revisions')
+        self.assertEqual(status, 200)
+        self.assertEqual([r['lines'][0]['qty'] for r in history['revisions']], [10, 20])
+
+    def test_approver_cannot_edit_or_create(self):
+        case = self.create()
+        headers = {'X-Demo-Actor': 'finance'}
+        self.assertEqual(self.request('PATCH', f'/api/cases/{case["id"]}',
+                                     {'revision': 1, 'recipient': 'Changed'}, headers)[0], 403)
+        self.assertEqual(self.request('POST', '/api/cases', {}, headers)[0], 403)
+        self.assertEqual(self.request('GET', '/api/cases', headers={'X-Demo-Actor': 'invented'})[0], 403)
+
+    def test_approval_request_cannot_override_delivery_block(self):
+        case = self.create('80 LT-PNL-36W-4K with another 20 percent discount')
+        status, _ = self.request('POST', f'/api/cases/{case["id"]}/request-approvals', {'revision': 1})
+        self.assertEqual(status, 409)

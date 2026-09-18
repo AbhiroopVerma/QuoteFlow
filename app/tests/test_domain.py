@@ -3,7 +3,7 @@ import json
 import unittest
 from pathlib import Path
 
-from app.domain import CATALOGUE, evaluate, extract, public_quote
+from app.backend.domain import CATALOGUE, evaluate, extract, public_quote
 
 
 class DomainTests(unittest.TestCase):
